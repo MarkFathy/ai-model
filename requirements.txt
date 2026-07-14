@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+paddlepaddle==3.0.0b2
+paddleocr
+pillow
+numpy
+python-multipart
