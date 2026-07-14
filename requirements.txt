@@ -1,7 +1,10 @@
 fastapi
 uvicorn
-paddlepaddle==3.0.0b2
-paddleocr
+paddlepaddle==2.6.2
+opencv-python-headless<4.10.0
+paddleocr==2.7.3
 pillow
-numpy
+numpy<2.0.0
 python-multipart
+scipy<1.12.0
+tifffile<2024.1.1
