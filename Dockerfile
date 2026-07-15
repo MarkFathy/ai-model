@@ -30,4 +30,4 @@ COPY . /code
 # Run uvicorn with a single worker (loads the OCR model only once)
 # and a longer keep-alive/timeout so the first request after the
 # free-tier instance wakes up from sleep doesn't get cut off.
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860", "--workers", "1", "--timeout-keep-alive", "120"]
+CMD python -m uvicorn app:app --host 0.0.0.0 --port ${PORT:-7860} --workers 1 --timeout-keep-alive 120
