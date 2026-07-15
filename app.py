@@ -42,6 +42,15 @@ def get_ocr():
 app = FastAPI(title="PaddleOCR Hugging Face API")
 
 
+@app.on_event("startup")
+def load_model_on_startup():
+    # Load the OCR model once, eagerly, at process startup instead of on
+    # the first request. This avoids the first real request timing out
+    # (and looking like a 502/503) while PaddleOCR downloads/loads its
+    # weights, especially right after the free-tier instance wakes up.
+    get_ocr()
+
+
 def resize_if_needed(image: Image.Image) -> Image.Image:
     width, height = image.size
     longest_side = max(width, height)
@@ -139,4 +148,6 @@ def home():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+    # Get port from environment variable (like on Railway) or default to 7860
+    port = int(os.environ.get("PORT", 7860))
+    uvicorn.run(app, host="0.0.0.0", port=port)
