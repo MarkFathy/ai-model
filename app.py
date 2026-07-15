@@ -1,3 +1,14 @@
+import os
+# Disable PaddlePaddle 3.0.0 PIR executor and fall back to stable legacy executor on CPU
+os.environ["FLAGS_enable_pir_api"] = "0"
+
+# Restrict math libraries to 1 CPU thread to reduce RAM usage and prevent OOM crashes on free hosting
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 import io
@@ -18,8 +29,14 @@ def get_ocr():
     global ocr
     if ocr is None:
         from paddleocr import PaddleOCR
-        # Initialize PaddleOCR for English (en) with MKLDNN disabled for stable deployment
-        ocr = PaddleOCR(use_angle_cls=False, lang='en', enable_mkldnn=False)
+        # Initialize PaddleOCR for English (en) with CPU thread restrictions for low-RAM stability
+        ocr = PaddleOCR(
+            use_angle_cls=False, 
+            lang='en', 
+            enable_mkldnn=False,
+            cpu_threads=1,
+            rec_batch_num=1
+        )
     return ocr
 
 app = FastAPI(title="PaddleOCR Hugging Face API")
